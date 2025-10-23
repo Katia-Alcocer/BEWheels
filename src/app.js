@@ -1,7 +1,10 @@
 import cors from 'cors';
-
 import express from 'express';
 import usuarioRoutes from './routers/usuario.routes.js';
+import authRoutes from './routers/auth.routes.js';
+import vehiculoRoutes from './routers/vehiculo.routes.js';
+import viajeRoutes from './routers/viaje.routes.js';
+import rolRoutes from './routers/rol.routes.js';
 import { pool } from './config/db.config.js';
 
 
@@ -14,6 +17,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/vehiculos', vehiculoRoutes);
+app.use('/api/viajes', viajeRoutes);
+app.use('/api/roles', rolRoutes);
 
 
 app.use(express.static('public'));

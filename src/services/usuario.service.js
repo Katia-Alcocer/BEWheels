@@ -20,8 +20,16 @@ export const UsuarioService = {
     });
 
     return usuario;
-  }
-,
+  },
+
+  async buscarPorCorreo(correo) {
+    return await UsuarioRepository.buscarPorCorreo(correo);
+  },
+
+  async buscarPorId(id) {
+    return await UsuarioRepository.buscarPorId(id);
+  },
+
   async listarUsuarios() {
     return await UsuarioRepository.listarUsuarios();
   }

@@ -24,6 +24,12 @@ export const UsuarioRepository = {
     return result.rows[0];
   },
 
+  async buscarPorId(id) {
+    const query = 'SELECT * FROM Usuarios WHERE id_usuario = $1';
+    const result = await pool.query(query, [id]);
+    return result.rows[0];
+  },
+
   async listarUsuarios() {
     const query = 'SELECT id_usuario, nombre, correo, telefono, fecha_registro FROM Usuarios ORDER BY fecha_registro DESC';
     const result = await pool.query(query);

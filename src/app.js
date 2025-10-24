@@ -29,20 +29,119 @@ app.use('/uploads', express.static('uploads'));
 
 // Ruta raíz - Página de bienvenida del API
 app.get('/', (req, res) => {
-  res.json({
-    message: '🚗 Wheels API - Sistema de Carpooling Universitario',
-    version: '1.0.0',
-    status: '✅ Servidor funcionando correctamente',
-    endpoints: {
-      auth: '/api/auth',
-      usuarios: '/api/usuarios',
-      vehiculos: '/api/vehiculos',
-      viajes: '/api/viajes',
-      roles: '/api/roles'
-    },
-    documentation: 'https://github.com/Katia-Alcocer/BEWheels',
-    timestamp: new Date().toISOString()
-  });
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wheels API</title>
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+            }
+            .container {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 40px;
+                text-align: center;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                max-width: 600px;
+                width: 90%;
+            }
+            .logo { font-size: 3rem; margin-bottom: 20px; }
+            h1 { font-size: 2.5rem; margin-bottom: 10px; }
+            .subtitle { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9; }
+            .status {
+                background: rgba(76, 175, 80, 0.2);
+                border: 1px solid #4CAF50;
+                border-radius: 10px;
+                padding: 15px;
+                margin: 20px 0;
+                font-size: 1.1rem;
+            }
+            .endpoints {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+                padding: 20px;
+                margin: 20px 0;
+                text-align: left;
+            }
+            .endpoint {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .endpoint:last-child { border-bottom: none; }
+            .method { color: #4CAF50; font-weight: bold; }
+            .url { color: #FFC107; }
+            .footer {
+                margin-top: 30px;
+                opacity: 0.8;
+                font-size: 0.9rem;
+            }
+            .timestamp {
+                font-size: 0.8rem;
+                opacity: 0.7;
+                margin-top: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="logo">🚗</div>
+            <h1>Wheels API</h1>
+            <p class="subtitle">Sistema de Carpooling Universitario</p>
+            
+            <div class="status">
+                ✅ Servidor funcionando correctamente
+            </div>
+            
+            <div class="endpoints">
+                <h3 style="margin-bottom: 15px; text-align: center;">📡 Endpoints Disponibles</h3>
+                <div class="endpoint">
+                    <span class="method">POST</span>
+                    <span class="url">/api/auth/login</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method">POST</span>
+                    <span class="url">/api/usuarios/register</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method">GET</span>
+                    <span class="url">/api/vehiculos</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method">GET</span>
+                    <span class="url">/api/viajes</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method">GET</span>
+                    <span class="url">/api/roles</span>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p><strong>Versión:</strong> 1.0.0</p>
+                <p><strong>Documentación:</strong> <a href="https://github.com/Katia-Alcocer/BEWheels" style="color: #FFC107;">GitHub Repository</a></p>
+                <div class="timestamp">
+                    Última actualización: ${new Date().toLocaleString('es-CO')}
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+  `);
 });
 
 app.get('/test-db', async (req, res) => {

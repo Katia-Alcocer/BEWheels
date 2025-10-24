@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/usuarios', usuarioRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); // Authentication routes
 app.use('/api/vehiculos', vehiculoRoutes);
 app.use('/api/viajes', viajeRoutes);
 app.use('/api/roles', rolRoutes);

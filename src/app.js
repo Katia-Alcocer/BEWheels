@@ -69,22 +69,26 @@ app.get('/', (req, res) => {
                 margin: 20px 0;
                 font-size: 1.1rem;
             }
-            .endpoints {
+            .features {
                 background: rgba(255, 255, 255, 0.1);
                 border-radius: 10px;
                 padding: 20px;
                 margin: 20px 0;
                 text-align: left;
             }
-            .endpoint {
+            .feature {
                 display: flex;
-                justify-content: space-between;
-                padding: 8px 0;
+                align-items: center;
+                padding: 12px 0;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                font-size: 1.1rem;
             }
-            .endpoint:last-child { border-bottom: none; }
-            .method { color: #4CAF50; font-weight: bold; }
-            .url { color: #FFC107; }
+            .feature:last-child { border-bottom: none; }
+            .feature span:first-child {
+                font-size: 1.5rem;
+                margin-right: 15px;
+                width: 30px;
+            }
             .footer {
                 margin-top: 30px;
                 opacity: 0.8;
@@ -107,27 +111,27 @@ app.get('/', (req, res) => {
                 ✅ Servidor funcionando correctamente
             </div>
             
-            <div class="endpoints">
-                <h3 style="margin-bottom: 15px; text-align: center;">📡 Endpoints Disponibles</h3>
-                <div class="endpoint">
-                    <span class="method">POST</span>
-                    <span class="url">/api/auth/login</span>
+            <div class="features">
+                <h3 style="margin-bottom: 15px; text-align: center;">🚀 Características del Sistema</h3>
+                <div class="feature">
+                    <span>👥</span>
+                    <span>Registro y autenticación de usuarios</span>
                 </div>
-                <div class="endpoint">
-                    <span class="method">POST</span>
-                    <span class="url">/api/usuarios/register</span>
+                <div class="feature">
+                    <span>🚗</span>
+                    <span>Gestión de vehículos</span>
                 </div>
-                <div class="endpoint">
-                    <span class="method">GET</span>
-                    <span class="url">/api/vehiculos</span>
+                <div class="feature">
+                    <span>🗺️</span>
+                    <span>Creación y búsqueda de viajes</span>
                 </div>
-                <div class="endpoint">
-                    <span class="method">GET</span>
-                    <span class="url">/api/viajes</span>
+                <div class="feature">
+                    <span>👤</span>
+                    <span>Sistema de roles (Pasajero/Conductor)</span>
                 </div>
-                <div class="endpoint">
-                    <span class="method">GET</span>
-                    <span class="url">/api/roles</span>
+                <div class="feature">
+                    <span>📱</span>
+                    <span>Interfaz web responsive</span>
                 </div>
             </div>
             

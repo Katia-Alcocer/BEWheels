@@ -27,6 +27,23 @@ app.use(express.static('public'));
 
 app.use('/uploads', express.static('uploads'));
 
+// Ruta raíz - Página de bienvenida del API
+app.get('/', (req, res) => {
+  res.json({
+    message: '🚗 Wheels API - Sistema de Carpooling Universitario',
+    version: '1.0.0',
+    status: '✅ Servidor funcionando correctamente',
+    endpoints: {
+      auth: '/api/auth',
+      usuarios: '/api/usuarios',
+      vehiculos: '/api/vehiculos',
+      viajes: '/api/viajes',
+      roles: '/api/roles'
+    },
+    documentation: 'https://github.com/Katia-Alcocer/BEWheels',
+    timestamp: new Date().toISOString()
+  });
+});
 
 app.get('/test-db', async (req, res) => {
 	try {

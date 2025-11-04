@@ -35,4 +35,37 @@ export const UsuarioRepository = {
     const result = await pool.query(query);
     return result.rows;
   },
+
+  async actualizarUsuarioPerfil(id_usuario, campos) {
+    const set = [];
+    const values = [];
+    let i = 1;
+
+    const addField = (col, val) => {
+      if (typeof val !== 'undefined') {
+        set.push(`${col} = $${i}`);
+        values.push(val);
+        i++;
+      }
+    };
+
+    addField('nombre', campos.nombre);
+    addField('id_universitario', campos.id_universitario);
+    addField('telefono', campos.telefono);
+    addField('foto_perfil', campos.foto_perfil);
+
+    if (set.length === 0) {
+      throw new Error('No hay campos para actualizar');
+    }
+
+    const query = `
+      UPDATE Usuarios
+      SET ${set.join(', ')}
+      WHERE id_usuario = $${i}
+      RETURNING id_usuario, nombre, id_universitario, correo, telefono, foto_perfil;
+    `;
+    values.push(id_usuario);
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  }
 };

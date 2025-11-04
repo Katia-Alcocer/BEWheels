@@ -1,6 +1,7 @@
 import express from 'express';
 import { UsuarioController } from '../controllers/usuario.controller.js';
 import { upload } from '../config/multer.config.js';
+import { authenticateToken } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
@@ -12,6 +13,15 @@ router.post(
 );
 
 router.get('/', UsuarioController.listarUsuarios);
+
+// Perfil del usuario autenticado
+router.get('/mi-perfil', authenticateToken, UsuarioController.obtenerMiPerfil);
+router.put(
+  '/mi-perfil',
+  authenticateToken,
+  upload.single('foto_perfil'),
+  UsuarioController.actualizarMiPerfil
+);
 
 export default router;
 

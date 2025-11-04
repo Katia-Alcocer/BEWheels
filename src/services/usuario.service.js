@@ -32,5 +32,29 @@ export const UsuarioService = {
 
   async listarUsuarios() {
     return await UsuarioRepository.listarUsuarios();
+  },
+
+  async actualizarPerfil(id_usuario, datos) {
+    // Obtener usuario actual
+    const actual = await UsuarioRepository.buscarPorId(id_usuario);
+    if (!actual) throw new Error('Usuario no encontrado');
+
+    // Verificar unicidad de id_universitario si cambia
+    if (datos.id_universitario && datos.id_universitario !== actual.id_universitario) {
+      const otro = await UsuarioRepository.buscarPorIdUniversitario(datos.id_universitario);
+      if (otro && otro.id_usuario !== id_usuario) {
+        throw new Error('El ID universitario ya está registrado.');
+      }
+    }
+
+    const permitidos = {
+      nombre: datos.nombre,
+      id_universitario: datos.id_universitario,
+      telefono: datos.telefono,
+      foto_perfil: datos.foto_perfil
+    };
+
+    const actualizado = await UsuarioRepository.actualizarUsuarioPerfil(id_usuario, permitidos);
+    return actualizado;
   }
 };

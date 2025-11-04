@@ -1,5 +1,5 @@
 import { UsuarioService } from '../services/usuario.service.js';
-import { usuarioSchema } from '../validations/usuario.validation.js';
+import { usuarioSchema, usuarioUpdateSchema } from '../validations/usuario.validation.js';
 
 export const UsuarioController = {
 
@@ -97,6 +97,82 @@ console.log('🟣 Archivo recibido:', req.file);
     } catch (err) {
       console.error('❌ Error al listar usuarios:', err);
       return res.status(500).json({ error: err.message });
+    }
+  },
+
+  async obtenerMiPerfil(req, res) {
+    try {
+      const id_usuario = req.user?.id_usuario;
+      if (!id_usuario) {
+        return res.status(401).json({ error: 'No autorizado: token inválido' });
+      }
+
+      const usuario = await UsuarioService.buscarPorId(id_usuario);
+      if (!usuario) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      }
+
+      const perfil = {
+        id_usuario: usuario.id_usuario,
+        nombre: usuario.nombre,
+        id_universitario: usuario.id_universitario,
+        correo: usuario.correo,
+        telefono: usuario.telefono,
+        foto_perfil: usuario.foto_perfil || null
+      };
+      return res.json(perfil);
+    } catch (err) {
+      console.error('❌ Error en obtenerMiPerfil:', err);
+      return res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  },
+
+  async actualizarMiPerfil(req, res) {
+    try {
+      const id_usuario = req.user?.id_usuario;
+      if (!id_usuario) {
+        return res.status(401).json({ error: 'No autorizado: token inválido' });
+      }
+
+      // DEBUG: Ver qué llega del frontend
+      console.log('🔍 req.body completo:', req.body);
+      console.log('🔍 Claves en req.body:', Object.keys(req.body || {}));
+      console.log('🔍 Archivo recibido:', req.file);
+
+      // Construir payload permitido (ignorar correo si viene)
+      const input = {
+        nombre: req.body?.nombre,
+        id_universitario: req.body?.id_universitario,
+        telefono: req.body?.telefono,
+      };
+
+      // Si se cargó foto, agregar ruta
+      if (req.file) {
+        input.foto_perfil = `/uploads/${req.file.filename}`;
+      }
+
+      // Validar y filtrar campos permitidos automáticamente
+      const { error, value } = usuarioUpdateSchema.validate(input, { 
+        abortEarly: true,
+        stripUnknown: true // Esto elimina campos no definidos en el esquema
+      });
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+      }
+
+      if (Object.keys(value).length === 0) {
+        return res.status(400).json({ error: 'No hay campos válidos para actualizar.' });
+      }
+
+      const usuarioActualizado = await UsuarioService.actualizarPerfil(id_usuario, value);
+
+      return res.json({ success: true, usuario: usuarioActualizado });
+    } catch (err) {
+      console.error('❌ Error en actualizarMiPerfil:', err);
+      const msg = err.message?.includes('ya está registrado')
+        ? err.message
+        : (err.message || 'Error al actualizar el perfil');
+      return res.status(400).json({ error: msg });
     }
   }
 };

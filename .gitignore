@@ -1,3 +1,5 @@
 node_modules
 .env
 package-lock.json
+WheelsP.sql
+ubicaciones_iniciales.sql

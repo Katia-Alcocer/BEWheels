@@ -5,6 +5,7 @@ import authRoutes from './routers/auth.routes.js';
 import vehiculoRoutes from './routers/vehiculo.routes.js';
 import viajeRoutes from './routers/viaje.routes.js';
 import rolRoutes from './routers/rol.routes.js';
+import ubicacionRoutes from './routers/ubicacion.routes.js';
 import { pool } from './config/db.config.js';
 
 
@@ -21,6 +22,7 @@ app.use('/api/auth', authRoutes); // Authentication routes - Updated for deploym
 app.use('/api/vehiculos', vehiculoRoutes);
 app.use('/api/viajes', viajeRoutes);
 app.use('/api/roles', rolRoutes);
+app.use('/api/ubicaciones', ubicacionRoutes);
 
 
 app.use(express.static('public'));
@@ -155,6 +157,76 @@ app.get('/test-db', async (req, res) => {
 	} catch (err) {
 		console.error('Error en /test-db:', err);
 		res.status(500).json({ error: 'Error al consultar la base de datos', details: err.message });
+	}
+});
+
+// Endpoint temporal para insertar ubicaciones iniciales
+app.get('/init-ubicaciones', async (req, res) => {
+	try {
+		// Primero verificar si la tabla existe y crearla si no existe
+		await pool.query(`
+			CREATE TABLE IF NOT EXISTS Ubicaciones_Comunes (
+				id_ubicacion SERIAL PRIMARY KEY,
+				nombre VARCHAR(100) UNIQUE NOT NULL,
+				activo BOOLEAN DEFAULT TRUE
+			)
+		`);
+
+		const ubicaciones = [
+			'Universidad de La Sabana',
+			'Centro Comercial Unicentro',
+			'Centro Comercial Santafé',
+			'Terminal de Transportes',
+			'Aeropuerto El Dorado',
+			'Plaza de Bolívar',
+			'Zona Rosa',
+			'Centro Histórico',
+			'Estación Transmilenio Portal Norte',
+			'Estación Transmilenio Portal Sur',
+			'Centro Comercial Andino',
+			'Centro Comercial Hacienda Santa Bárbara',
+			'Parque 93',
+			'Universidad Nacional',
+			'Universidad Javeriana',
+			'Universidad de los Andes',
+			'Hospital San Ignacio',
+			'Clínica Colombia',
+			'Biblioteca Luis Ángel Arango',
+			'Museo del Oro',
+			'Candelaria',
+			'Chapinero',
+			'Usaquén',
+			'La Calera',
+			'Chía',
+			'Cajicá',
+			'Zipaquirá',
+			'Sopó',
+			'Tocancipá',
+			'Gachancipá',
+			'Nemocón'
+		];
+
+		const insertPromises = ubicaciones.map(async (nombre) => {
+			try {
+				await pool.query(
+					'INSERT INTO Ubicaciones_Comunes (nombre) VALUES ($1) ON CONFLICT (nombre) DO NOTHING',
+					[nombre]
+				);
+			} catch (err) {
+				console.error(`Error insertando ${nombre}:`, err);
+			}
+		});
+
+		await Promise.all(insertPromises);
+
+		const result = await pool.query('SELECT COUNT(*) as total FROM Ubicaciones_Comunes WHERE activo = true');
+		res.json({ 
+			message: 'Ubicaciones iniciales insertadas correctamente',
+			total_ubicaciones: result.rows[0].total
+		});
+	} catch (err) {
+		console.error('Error en /init-ubicaciones:', err);
+		res.status(500).json({ error: 'Error al insertar ubicaciones', details: err.message });
 	}
 });
 

@@ -144,6 +144,7 @@ console.log('🟣 Archivo recibido:', req.file);
         nombre: req.body?.nombre,
         id_universitario: req.body?.id_universitario,
         telefono: req.body?.telefono,
+        contrasena: req.body?.contrasena, // Incluir contraseña
       };
 
       // Si se cargó foto, agregar ruta

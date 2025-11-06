@@ -54,6 +54,11 @@ export const UsuarioService = {
       foto_perfil: datos.foto_perfil
     };
 
+    // Si se proporciona contraseña, hashearla
+    if (datos.contrasena) {
+      permitidos.contrasena_hash = await hashPassword(datos.contrasena);
+    }
+
     const actualizado = await UsuarioRepository.actualizarUsuarioPerfil(id_usuario, permitidos);
     return actualizado;
   }

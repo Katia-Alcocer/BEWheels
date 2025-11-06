@@ -76,5 +76,11 @@ export const usuarioUpdateSchema = Joi.object({
       'string.min': 'El teléfono debe tener al menos 7 dígitos.',
       'string.max': 'El teléfono no debe superar los 15 dígitos.'
     }),
+  contrasena: Joi.string()
+    .min(8)
+    .optional()
+    .messages({
+      'string.min': 'La contraseña debe tener al menos 8 caracteres.'
+    }),
   foto_perfil: Joi.string().optional()
 }).unknown(true);

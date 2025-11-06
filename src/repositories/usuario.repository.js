@@ -53,6 +53,7 @@ export const UsuarioRepository = {
     addField('id_universitario', campos.id_universitario);
     addField('telefono', campos.telefono);
     addField('foto_perfil', campos.foto_perfil);
+    addField('contrasena_hash', campos.contrasena_hash);
 
     if (set.length === 0) {
       throw new Error('No hay campos para actualizar');

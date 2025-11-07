@@ -93,5 +93,27 @@ export const ReservaRepository = {
     `;
     const result = await pool.query(query, [id_viaje]);
     return parseInt(result.rows[0].total_cupos_reservados);
+  },
+
+  async listarSolicitudesConductor(id_conductor) {
+    const query = `
+      SELECT 
+        r.*,
+        v.origen,
+        v.destino,
+        v.fecha_salida,
+        v.tarifa,
+        v.cupos_totales,
+        v.cupos_disponibles,
+        u.nombre as nombre_pasajero,
+        u.telefono as telefono_pasajero
+      FROM Reservas r
+      JOIN Viajes v ON r.id_viaje = v.id_viaje
+      JOIN Usuarios u ON r.id_pasajero = u.id_usuario
+      WHERE v.id_conductor = $1
+      ORDER BY r.fecha_reserva DESC
+    `;
+    const result = await pool.query(query, [id_conductor]);
+    return result.rows;
   }
 };

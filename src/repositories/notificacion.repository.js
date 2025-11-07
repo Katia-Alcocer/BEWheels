@@ -1,13 +1,13 @@
 import { pool } from '../config/db.config.js';
 
 export const NotificacionRepository = {
-  async crearNotificacion({ id_usuario, titulo, mensaje, tipo }) {
+  async crearNotificacion({ id_usuario, titulo, mensaje }) {
     const query = `
-      INSERT INTO Notificaciones (id_usuario, titulo, mensaje, tipo, leida)
-      VALUES ($1, $2, $3, $4, false)
-      RETURNING id_notificacion, id_usuario, titulo, mensaje, tipo, leida, fecha_envio;
+      INSERT INTO Notificaciones (id_usuario, titulo, mensaje, leida)
+      VALUES ($1, $2, $3, false)
+      RETURNING id_notificacion, id_usuario, titulo, mensaje, leida, fecha_envio;
     `;
-    const values = [id_usuario, titulo, mensaje, tipo || 'general'];
+    const values = [id_usuario, titulo, mensaje];
     const result = await pool.query(query, values);
     return result.rows[0];
   },

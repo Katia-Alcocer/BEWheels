@@ -42,8 +42,7 @@ export const ReservaService = {
     await NotificacionService.enviarNotificacion({
       id_usuario: viaje.id_conductor,
       titulo: 'Nueva solicitud de reserva',
-      mensaje: `${viaje.nombre_pasajero || 'Un pasajero'} ha solicitado ${cupos_reservados} cupo(s) en tu viaje de ${viaje.origen} a ${viaje.destino}`,
-      tipo: 'reserva_nueva'
+      mensaje: `${viaje.nombre_pasajero || 'Un pasajero'} ha solicitado ${cupos_reservados} cupo(s) en tu viaje de ${viaje.origen} a ${viaje.destino}`
     });
 
     return nuevaReserva;
@@ -86,8 +85,7 @@ export const ReservaService = {
     await NotificacionService.enviarNotificacion({
       id_usuario: reserva.id_pasajero,
       titulo: 'Reserva aceptada',
-      mensaje: `Tu reserva para el viaje de ${viaje.origen} a ${viaje.destino} ha sido aceptada`,
-      tipo: 'reserva_aceptada'
+      mensaje: `Tu reserva para el viaje de ${viaje.origen} a ${viaje.destino} ha sido aceptada`
     });
 
     return reservaActualizada;
@@ -112,8 +110,7 @@ export const ReservaService = {
     await NotificacionService.enviarNotificacion({
       id_usuario: reserva.id_pasajero,
       titulo: 'Reserva rechazada',
-      mensaje: `Tu reserva para el viaje de ${viaje.origen} a ${viaje.destino} ha sido rechazada`,
-      tipo: 'reserva_rechazada'
+      mensaje: `Tu reserva para el viaje de ${viaje.origen} a ${viaje.destino} ha sido rechazada`
     });
 
     return reservaActualizada;
@@ -153,8 +150,7 @@ export const ReservaService = {
       await NotificacionService.enviarNotificacion({
         id_usuario: viaje.id_conductor,
         titulo: 'Reserva cancelada',
-        mensaje: `Un pasajero ha cancelado su reserva de ${reserva.cupos_reservados} cupo(s) en tu viaje de ${viaje.origen} a ${viaje.destino}`,
-        tipo: 'reserva_cancelada'
+        mensaje: `Un pasajero ha cancelado su reserva de ${reserva.cupos_reservados} cupo(s) en tu viaje de ${viaje.origen} a ${viaje.destino}`
       });
     }
 
@@ -167,5 +163,9 @@ export const ReservaService = {
 
   async listarReservasPorPasajero(id_pasajero) {
     return await ReservaRepository.listarReservasPorPasajero(id_pasajero);
+  },
+
+  async listarSolicitudesConductor(id_conductor) {
+    return await ReservaRepository.listarSolicitudesConductor(id_conductor);
   }
 };

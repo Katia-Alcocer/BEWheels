@@ -129,5 +129,21 @@ export const ReservaController = {
       console.error('❌ Error al listar reservas del viaje:', err);
       return res.status(500).json({ error: err.message });
     }
+  },
+
+  async listarSolicitudesConductor(req, res) {
+    try {
+      const id_conductor = req.user?.id_usuario;
+      if (!id_conductor) {
+        return res.status(401).json({ error: 'No autorizado: token inválido' });
+      }
+
+      const solicitudes = await ReservaService.listarSolicitudesConductor(id_conductor);
+
+      return res.json(solicitudes);
+    } catch (err) {
+      console.error('❌ Error al listar solicitudes del conductor:', err);
+      return res.status(500).json({ error: err.message });
+    }
   }
 };

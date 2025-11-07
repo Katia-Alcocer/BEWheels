@@ -10,6 +10,9 @@ router.post('/', authenticateToken, ReservaController.crearReserva);
 // Listar mis reservas (pasajero)
 router.get('/mis-reservas', authenticateToken, ReservaController.listarMisReservas);
 
+// Listar solicitudes para conductor
+router.get('/solicitudes-conductor', authenticateToken, ReservaController.listarSolicitudesConductor);
+
 // Aceptar reserva (conductor)
 router.put('/:id_reserva/aceptar', authenticateToken, ReservaController.aceptarReserva);
 

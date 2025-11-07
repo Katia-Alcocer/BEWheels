@@ -105,6 +105,26 @@ app.get('/', (req, res) => {
                 opacity: 0.7;
                 margin-top: 10px;
             }
+            .frontend-link {
+                display: inline-block;
+                margin-top: 25px;
+                padding: 15px 30px;
+                background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+                color: #333;
+                text-decoration: none;
+                border-radius: 10px;
+                font-weight: bold;
+                font-size: 1.1rem;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+            }
+            .frontend-link:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(255, 193, 7, 0.5);
+            }
+            .frontend-link:active {
+                transform: translateY(0);
+            }
         </style>
     </head>
     <body>
@@ -116,6 +136,10 @@ app.get('/', (req, res) => {
             <div class="status">
                 ✅ Servidor funcionando correctamente
             </div>
+            
+            <a href="https://fe-wheels.vercel.app" target="_blank" class="frontend-link">
+                🌐 Ir a la Aplicación Web
+            </a>
             
             <div class="features">
                 <h3 style="margin-bottom: 15px; text-align: center;">🚀 Características del Sistema</h3>

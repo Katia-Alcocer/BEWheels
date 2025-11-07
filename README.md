@@ -4,7 +4,7 @@ Backend para el proyecto BEWheels, una plataforma de carpooling universitario.
 
 ##  Backend Desplegado
 
-**URL de Producción:** `https://bewheels.onrender.com`
+**URL de Producción:** `https://bewheels-xmjl.onrender.com`
 
 Usa este dominio en tu frontend para consumir la API en producción.
 
@@ -84,7 +84,7 @@ curl http://localhost:5000/test-db
 ### Base URLs
 
 - **Desarrollo:** `http://localhost:5000`
-- **Producción:** `https://bewheels.onrender.com`
+- **Producción:** `https://bewheels-xmjl.onrender.com`
 
 ---
 
@@ -139,7 +139,7 @@ formData.append('contrasena', 'miPassword123');
 // Si hay foto:
 formData.append('foto_perfil', fileInput.files[0]);
 
-const response = await fetch('https://bewheels.onrender.com/api/usuarios/register', {
+const response = await fetch('https://bewheels-xmjl.onrender.com/api/usuarios/register', {
   method: 'POST',
   body: formData
 });
@@ -213,7 +213,7 @@ Inicia sesión y obtiene un token JWT.
 **Ejemplo JavaScript:**
 
 ```javascript
-const response = await fetch('https://bewheels.onrender.com/api/auth/login', {
+const response = await fetch('https://bewheels-xmjl.onrender.com/api/auth/login', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -332,7 +332,7 @@ formData.append('modelo', 'Corolla');
 formData.append('capacidad', '4');
 formData.append('foto', fileInput.files[0]);
 
-const response = await fetch('https://bewheels.onrender.com/api/vehiculos/registro', {
+const response = await fetch('https://bewheels-xmjl.onrender.com/api/vehiculos/registro', {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${token}`
@@ -469,7 +469,7 @@ Crea un nuevo viaje.
 **Ejemplo:**
 
 ```javascript
-const response = await fetch('https://bewheels.onrender.com/api/viajes', {
+const response = await fetch('https://bewheels-xmjl.onrender.com/api/viajes', {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${token}`,
@@ -523,7 +523,7 @@ Lista viajes disponibles con filtros opcionales.
 
 ```javascript
 const response = await fetch(
-  'https://bewheels.onrender.com/api/viajes/disponibles?origen=Universidad&destino=Centro',
+  'https://bewheels-xmjl.onrender.com/api/viajes/disponibles?origen=Universidad&destino=Centro',
   {
     headers: {
       'Authorization': `Bearer ${token}`
@@ -689,15 +689,15 @@ const imageUrl = `http://localhost:5000${usuario.foto_perfil}`;
 
 **Producción:**
 ```javascript
-const imageUrl = `https://bewheels.onrender.com${usuario.foto_perfil}`;
-// Ejemplo: https://bewheels.onrender.com/uploads/foto_perfil-123456.jpg
+const imageUrl = `https://bewheels-xmjl.onrender.com${usuario.foto_perfil}`;
+// Ejemplo: https://bewheels-xmjl.onrender.com/uploads/foto_perfil-123456.jpg
 ```
 
 **Componente React:**
 
 ```jsx
 function Avatar({ usuario }) {
-  const baseURL = process.env.REACT_APP_API_URL || 'https://bewheels.onrender.com';
+  const baseURL = process.env.REACT_APP_API_URL || 'https://bewheels-xmjl.onrender.com';
   const imageUrl = usuario.foto_perfil 
     ? `${baseURL}${usuario.foto_perfil}` 
     : '/default-avatar.png';
@@ -729,7 +729,7 @@ function Avatar({ usuario }) {
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'https://bewheels.onrender.com'
+  baseURL: 'https://bewheels-xmjl.onrender.com'
 });
 
 // Interceptor para agregar token automáticamente
@@ -771,7 +771,7 @@ export const obtenerViajesDisponibles = async (filtros = {}) => {
 ### React + Fetch
 
 ```javascript
-const API_URL = 'https://bewheels.onrender.com';
+const API_URL = 'https://bewheels-xmjl.onrender.com';
 
 // Función helper para fetch con autenticación
 async function fetchAPI(endpoint, options = {}) {
@@ -821,13 +821,13 @@ Crea un archivo `.env` en tu proyecto frontend:
 REACT_APP_API_URL=http://localhost:5000
 
 # Producción
-# REACT_APP_API_URL=https://bewheels.onrender.com
+# REACT_APP_API_URL=https://bewheels-xmjl.onrender.com
 ```
 
 Uso en el código:
 
 ```javascript
-const API_URL = process.env.REACT_APP_API_URL || 'https://bewheels.onrender.com';
+const API_URL = process.env.REACT_APP_API_URL || 'https://bewheels-xmjl.onrender.com';
 ```
 
 ---
@@ -866,7 +866,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://bewheels.onrender.com'
 
 ### Imágenes no se muestran
 - Verifica que la URL incluya el dominio completo del backend
-- Ejemplo correcto: `https://bewheels.onrender.com/uploads/foto.jpg`
+- Ejemplo correcto: `https://bewheels-xmjl.onrender.com/uploads/foto.jpg`
 
 ---
 

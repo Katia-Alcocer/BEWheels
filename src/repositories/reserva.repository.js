@@ -110,8 +110,14 @@ export const ReservaRepository = {
       FROM Reservas r
       JOIN Viajes v ON r.id_viaje = v.id_viaje
       JOIN Usuarios u ON r.id_pasajero = u.id_usuario
-      WHERE v.id_conductor = $1
-      ORDER BY r.fecha_reserva DESC
+      WHERE v.id_conductor = $1 
+      AND r.estado IN ('Pendiente', 'Aceptada')
+      ORDER BY 
+        CASE r.estado 
+          WHEN 'Pendiente' THEN 1 
+          WHEN 'Aceptada' THEN 2 
+        END,
+        r.fecha_reserva DESC
     `;
     const result = await pool.query(query, [id_conductor]);
     return result.rows;

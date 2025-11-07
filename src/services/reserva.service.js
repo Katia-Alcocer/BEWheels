@@ -106,11 +106,11 @@ export const ReservaService = {
     // Rechazar la reserva
     const reservaActualizada = await ReservaRepository.actualizarEstadoReserva(id_reserva, 'Rechazada');
 
-    // Notificar al pasajero
-    await NotificacionService.enviarNotificacion({
+    // Notificar al pasajero con notificación persistente
+    await NotificacionService.enviarNotificacionPersistente({
       id_usuario: reserva.id_pasajero,
-      titulo: 'Reserva rechazada',
-      mensaje: `Tu reserva para el viaje de ${viaje.origen} a ${viaje.destino} ha sido rechazada`
+      titulo: '❌ Reserva rechazada',
+      mensaje: `Lo sentimos, tu solicitud de reserva para el viaje de ${viaje.origen} a ${viaje.destino} ha sido rechazada por el conductor. Puedes buscar otros viajes disponibles.`
     });
 
     return reservaActualizada;

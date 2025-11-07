@@ -1,7 +1,7 @@
 import { pool } from '../config/db.config.js';
 
 export const NotificacionRepository = {
-  async crearNotificacion({ id_usuario, titulo, mensaje }) {
+  async crearNotificacion({ id_usuario, titulo, mensaje, es_persistente = false }) {
     const query = `
       INSERT INTO Notificaciones (id_usuario, titulo, mensaje, leida)
       VALUES ($1, $2, $3, false)
@@ -16,6 +16,16 @@ export const NotificacionRepository = {
     const query = `
       SELECT * FROM Notificaciones 
       WHERE id_usuario = $1 
+      ORDER BY fecha_envio DESC
+    `;
+    const result = await pool.query(query, [id_usuario]);
+    return result.rows;
+  },
+
+  async listarNotificacionesNoLeidas(id_usuario) {
+    const query = `
+      SELECT * FROM Notificaciones 
+      WHERE id_usuario = $1 AND leida = false
       ORDER BY fecha_envio DESC
     `;
     const result = await pool.query(query, [id_usuario]);

@@ -11,8 +11,24 @@ export const NotificacionService = {
     }
   },
 
+  async enviarNotificacionPersistente(datosNotificacion) {
+    try {
+      return await NotificacionRepository.crearNotificacion({
+        ...datosNotificacion,
+        es_persistente: true
+      });
+    } catch (error) {
+      console.error('Error enviando notificación persistente:', error);
+      return null;
+    }
+  },
+
   async listarNotificaciones(id_usuario) {
     return await NotificacionRepository.listarNotificacionesPorUsuario(id_usuario);
+  },
+
+  async listarNotificacionesNoLeidas(id_usuario) {
+    return await NotificacionRepository.listarNotificacionesNoLeidas(id_usuario);
   },
 
   async marcarComoLeida(id_notificacion, id_usuario) {

@@ -7,6 +7,9 @@ const router = express.Router();
 // Listar notificaciones del usuario
 router.get('/', authenticateToken, NotificacionController.listarNotificaciones);
 
+// Listar notificaciones no leídas
+router.get('/no-leidas', authenticateToken, NotificacionController.listarNotificacionesNoLeidas);
+
 // Contar notificaciones no leídas
 router.get('/no-leidas/count', authenticateToken, NotificacionController.contarNoLeidas);
 

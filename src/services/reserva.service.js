@@ -35,14 +35,31 @@ export const ReservaService = {
       throw new Error(`Solo hay ${cuposDisponibles} cupos disponibles`);
     }
 
-    // Crear la reserva
+    // Crear la reserva con estado "Aceptada" automáticamente
     const nuevaReserva = await ReservaRepository.crearReserva(datosReserva);
+
+    // Actualizar cupos disponibles del viaje automáticamente
+    const nuevoCuposOcupados = cuposOcupados + cupos_reservados;
+    const nuevosCuposDisponibles = viaje.cupos_totales - nuevoCuposOcupados;
+    await ViajeRepository.actualizarCuposDisponibles(id_viaje, nuevosCuposDisponibles);
+
+    // Si el viaje está lleno, marcarlo como tal
+    if (nuevosCuposDisponibles === 0) {
+      await ViajeRepository.marcarViajeComoLleno(id_viaje);
+    }
 
     // Enviar notificación al conductor
     await NotificacionService.enviarNotificacion({
       id_usuario: viaje.id_conductor,
-      titulo: 'Nueva solicitud de reserva',
-      mensaje: `${viaje.nombre_pasajero || 'Un pasajero'} ha solicitado ${cupos_reservados} cupo(s) en tu viaje de ${viaje.origen} a ${viaje.destino}`
+      titulo: 'Nueva reserva confirmada',
+      mensaje: `Un pasajero ha reservado ${cupos_reservados} cupo(s) en tu viaje de ${viaje.origen} a ${viaje.destino}`
+    });
+
+    // Enviar notificación al pasajero
+    await NotificacionService.enviarNotificacion({
+      id_usuario: id_pasajero,
+      titulo: 'Reserva confirmada',
+      mensaje: `Tu reserva para el viaje de ${viaje.origen} a ${viaje.destino} ha sido confirmada automáticamente`
     });
 
     return nuevaReserva;
@@ -127,32 +144,30 @@ export const ReservaService = {
       throw new Error('No tienes autorización para cancelar esta reserva');
     }
 
-    // Solo se puede cancelar si está pendiente o aceptada
-    if (!['Pendiente', 'Aceptada'].includes(reserva.estado)) {
+    // Solo se puede cancelar si está aceptada
+    if (reserva.estado !== 'Aceptada') {
       throw new Error('No puedes cancelar esta reserva en su estado actual');
     }
 
     // Cancelar la reserva
     const reservaActualizada = await ReservaRepository.cancelarReserva(id_reserva);
 
-    // Si estaba aceptada, liberar los cupos
-    if (reserva.estado === 'Aceptada') {
-      const viaje = await ViajeRepository.obtenerViaje(reserva.id_viaje);
-      const nuevosCuposDisponibles = viaje.cupos_disponibles + reserva.cupos_reservados;
-      await ViajeRepository.actualizarCuposDisponibles(reserva.id_viaje, nuevosCuposDisponibles);
+    // Liberar los cupos automáticamente
+    const viaje = await ViajeRepository.obtenerViaje(reserva.id_viaje);
+    const nuevosCuposDisponibles = viaje.cupos_disponibles + reserva.cupos_reservados;
+    await ViajeRepository.actualizarCuposDisponibles(reserva.id_viaje, nuevosCuposDisponibles);
 
-      // Si el viaje estaba lleno, reactivarlo
-      if (viaje.estado === 'Lleno') {
-        await ViajeRepository.actualizarViaje(reserva.id_viaje, { estado: 'Activo' });
-      }
-
-      // Notificar al conductor
-      await NotificacionService.enviarNotificacion({
-        id_usuario: viaje.id_conductor,
-        titulo: 'Reserva cancelada',
-        mensaje: `Un pasajero ha cancelado su reserva de ${reserva.cupos_reservados} cupo(s) en tu viaje de ${viaje.origen} a ${viaje.destino}`
-      });
+    // Si el viaje estaba lleno, reactivarlo
+    if (viaje.estado === 'Lleno') {
+      await ViajeRepository.actualizarViaje(reserva.id_viaje, { estado: 'Activo' });
     }
+
+    // Notificar al conductor
+    await NotificacionService.enviarNotificacion({
+      id_usuario: viaje.id_conductor,
+      titulo: 'Reserva cancelada',
+      mensaje: `Un pasajero ha cancelado su reserva de ${reserva.cupos_reservados} cupo(s) en tu viaje de ${viaje.origen} a ${viaje.destino}`
+    });
 
     return reservaActualizada;
   },
@@ -180,12 +195,12 @@ export const ReservaService = {
       throw new Error('No tienes autorización para eliminar esta reserva');
     }
 
-    // Solo se puede eliminar si está pendiente o aceptada
-    if (!['Pendiente', 'Aceptada'].includes(reserva.estado)) {
+    // Solo se puede eliminar si está aceptada
+    if (reserva.estado !== 'Aceptada') {
       throw new Error('No puedes eliminar esta reserva en su estado actual');
     }
 
-    // Verificar el tiempo restante (más de 1 hora)
+    // Verificar el tiempo restante (más de 2 horas)
     const validacionTiempo = await ReservaRepository.verificarTiempoReserva(id_reserva);
     if (!validacionTiempo.puede) {
       throw new Error(validacionTiempo.razon);
@@ -197,20 +212,17 @@ export const ReservaService = {
       throw new Error('No se pudo eliminar la reserva');
     }
 
-    // Si estaba aceptada, liberar los cupos
-    if (reserva.estado === 'Aceptada') {
-      const viaje = await ViajeRepository.obtenerViaje(reserva.id_viaje);
-      const nuevosCuposDisponibles = viaje.cupos_disponibles + reserva.cupos_reservados;
-      await ViajeRepository.actualizarCuposDisponibles(reserva.id_viaje, nuevosCuposDisponibles);
+    // Liberar los cupos automáticamente
+    const viaje = await ViajeRepository.obtenerViaje(reserva.id_viaje);
+    const nuevosCuposDisponibles = viaje.cupos_disponibles + reserva.cupos_reservados;
+    await ViajeRepository.actualizarCuposDisponibles(reserva.id_viaje, nuevosCuposDisponibles);
 
-      // Si el viaje estaba lleno, reactivarlo
-      if (viaje.estado === 'Lleno') {
-        await ViajeRepository.actualizarViaje(reserva.id_viaje, { estado: 'Activo' });
-      }
+    // Si el viaje estaba lleno, reactivarlo
+    if (viaje.estado === 'Lleno') {
+      await ViajeRepository.actualizarViaje(reserva.id_viaje, { estado: 'Activo' });
     }
 
-    // Notificar al conductor siempre (ya sea pendiente o aceptada)
-    const viaje = await ViajeRepository.obtenerViaje(reserva.id_viaje);
+    // Notificar al conductor
     await NotificacionService.enviarNotificacion({
       id_usuario: viaje.id_conductor,
       titulo: 'Reserva eliminada',

@@ -1,4 +1,5 @@
 import { ViajeRepository } from '../repositories/viaje.repository.js';
+import { RolService } from './rol.service.js';
 
 export const ViajeService = {
   async crearViaje(datosViaje) {
@@ -54,6 +55,14 @@ export const ViajeService = {
       throw new Error('No se pudo cancelar el viaje');
     }
 
+    // Verificar si debe desactivar el rol de conductor
+    try {
+      await RolService.verificarYDesactivarRolConductor(id_conductor);
+    } catch (error) {
+      console.error('Error verificando rol de conductor:', error);
+      // No fallar la cancelación si hay error en la verificación de rol
+    }
+
     // TODO: Notificar a todos los pasajeros con reservas aceptadas
     // y liberar los cupos automáticamente
 
@@ -75,7 +84,17 @@ export const ViajeService = {
       throw new Error('Solo se pueden completar viajes activos o llenos');
     }
 
-    return await ViajeRepository.completarViaje(id);
+    const viajeCompletado = await ViajeRepository.completarViaje(id);
+
+    // Verificar si debe desactivar el rol de conductor
+    try {
+      await RolService.verificarYDesactivarRolConductor(id_conductor);
+    } catch (error) {
+      console.error('Error verificando rol de conductor:', error);
+      // No fallar la completación si hay error en la verificación de rol
+    }
+
+    return viajeCompletado;
   },
 
   async verificarViajeActivo(id_conductor) {

@@ -29,6 +29,21 @@ export const VehiculoService = {
   },
 
   async eliminarVehiculo(id) {
-    return await VehiculoRepository.eliminarVehiculo(id);
+    const vehiculo = await VehiculoRepository.buscarPorId(id);
+    if (!vehiculo) {
+      throw new Error('Vehículo no encontrado');
+    }
+
+    const vehiculoEliminado = await VehiculoRepository.eliminarVehiculo(id);
+
+    // Verificar si debe desactivar el rol de conductor
+    try {
+      await RolService.verificarYDesactivarRolConductor(vehiculo.id_usuario);
+    } catch (error) {
+      console.error('Error verificando rol de conductor:', error);
+      // No fallar la eliminación si hay error en la verificación de rol
+    }
+
+    return vehiculoEliminado;
   }
 };

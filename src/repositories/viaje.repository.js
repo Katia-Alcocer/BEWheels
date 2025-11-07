@@ -93,5 +93,49 @@ export const ViajeRepository = {
     `;
     const result = await pool.query(query, [id]);
     return result.rows[0];
+  },
+
+  async completarViaje(id) {
+    const query = `
+      UPDATE Viajes 
+      SET estado = 'Completado'
+      WHERE id_viaje = $1 AND estado = 'Activo'
+      RETURNING *;
+    `;
+    const result = await pool.query(query, [id]);
+    return result.rows[0];
+  },
+
+  async buscarViajeActivoPorConductor(id_conductor) {
+    const query = `
+      SELECT * FROM Viajes 
+      WHERE id_conductor = $1 AND estado IN ('Activo', 'En_Progreso')
+      ORDER BY fecha_creacion DESC
+      LIMIT 1
+    `;
+    const result = await pool.query(query, [id_conductor]);
+    return result.rows[0];
+  },
+
+  async actualizarCuposDisponibles(id_viaje, nuevos_cupos) {
+    const query = `
+      UPDATE Viajes 
+      SET cupos_disponibles = $2
+      WHERE id_viaje = $1
+      RETURNING *;
+    `;
+    const result = await pool.query(query, [id_viaje, nuevos_cupos]);
+    return result.rows[0];
+  },
+
+  async marcarViajeComoLleno(id_viaje) {
+    const query = `
+      UPDATE Viajes 
+      SET estado = 'Lleno'
+      WHERE id_viaje = $1 AND estado = 'Activo'
+      RETURNING *;
+    `;
+    const result = await pool.query(query, [id_viaje]);
+    return result.rows[0];
   }
 };

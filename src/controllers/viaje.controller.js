@@ -104,5 +104,39 @@ export const ViajeController = {
       console.error('Error en cancelarViaje:', err);
       return res.status(500).json({ error: 'Error interno del servidor' });
     }
+  },
+
+  async verificarViajeActivo(req, res) {
+    try {
+      const id_conductor = req.user?.id_usuario;
+      if (!id_conductor) {
+        return res.status(401).json({ error: 'No autorizado: token inválido' });
+      }
+
+      const viajeActivo = await ViajeService.verificarViajeActivo(id_conductor);
+
+      return res.json({
+        tieneViajeActivo: !!viajeActivo,
+        viajeActivo: viajeActivo || null
+      });
+    } catch (err) {
+      console.error('Error en verificarViajeActivo:', err);
+      return res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  },
+
+  async completarViaje(req, res) {
+    try {
+      const { id } = req.params;
+      const completado = await ViajeService.completarViaje(id);
+      if (!completado) {
+        return res.status(404).json({ error: 'Viaje no encontrado' });
+      }
+
+      return res.json({ message: 'Viaje completado con éxito' });
+    } catch (err) {
+      console.error('Error en completarViaje:', err);
+      return res.status(500).json({ error: 'Error interno del servidor' });
+    }
   }
 };

@@ -6,6 +6,8 @@ import vehiculoRoutes from './routers/vehiculo.routes.js';
 import viajeRoutes from './routers/viaje.routes.js';
 import rolRoutes from './routers/rol.routes.js';
 import ubicacionRoutes from './routers/ubicacion.routes.js';
+import reservaRoutes from './routers/reserva.routes.js';
+import notificacionRoutes from './routers/notificacion.routes.js';
 import { pool } from './config/db.config.js';
 
 
@@ -23,6 +25,8 @@ app.use('/api/vehiculos', vehiculoRoutes);
 app.use('/api/viajes', viajeRoutes);
 app.use('/api/roles', rolRoutes);
 app.use('/api/ubicaciones', ubicacionRoutes);
+app.use('/api/reservas', reservaRoutes);
+app.use('/api/notificaciones', notificacionRoutes);
 
 
 app.use(express.static('public'));

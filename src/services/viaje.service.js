@@ -12,10 +12,14 @@ export const ViajeService = {
   },
 
   async listarViajesDisponibles(filtros, id_usuario_actual = null) {
+    // Verificar y actualizar viajes vencidos antes de listar
+    await ViajeRepository.verificarYActualizarViajesVencidos();
     return await ViajeRepository.listarViajesDisponibles(filtros, id_usuario_actual);
   },
 
   async listarViajesPorConductor(id_conductor) {
+    // Verificar y actualizar viajes vencidos antes de listar
+    await ViajeRepository.verificarYActualizarViajesVencidos();
     return await ViajeRepository.listarViajesPorConductor(id_conductor);
   },
 
@@ -27,15 +31,60 @@ export const ViajeService = {
     return await ViajeRepository.actualizarViaje(id, datosViaje);
   },
 
-  async cancelarViaje(id) {
-    return await ViajeRepository.cancelarViaje(id);
+  async cancelarViaje(id, id_conductor) {
+    // Verificar que el viaje pertenezca al conductor
+    const viaje = await ViajeRepository.obtenerViaje(id);
+    if (!viaje) {
+      throw new Error('El viaje no existe');
+    }
+
+    if (viaje.id_conductor !== id_conductor) {
+      throw new Error('No tienes autorización para cancelar este viaje');
+    }
+
+    // Verificar que se pueda modificar (al menos 1 hora antes)
+    const validacion = await ViajeRepository.puedeModificarViaje(id);
+    if (!validacion.puede) {
+      throw new Error(validacion.razon);
+    }
+
+    // Cancelar el viaje
+    const viajeCancelado = await ViajeRepository.cancelarViaje(id);
+    if (!viajeCancelado) {
+      throw new Error('No se pudo cancelar el viaje');
+    }
+
+    // TODO: Notificar a todos los pasajeros con reservas aceptadas
+    // y liberar los cupos automáticamente
+
+    return viajeCancelado;
   },
 
-  async completarViaje(id) {
+  async completarViaje(id, id_conductor) {
+    // Verificar que el viaje pertenezca al conductor
+    const viaje = await ViajeRepository.obtenerViaje(id);
+    if (!viaje) {
+      throw new Error('El viaje no existe');
+    }
+
+    if (viaje.id_conductor !== id_conductor) {
+      throw new Error('No tienes autorización para completar este viaje');
+    }
+
+    if (!['Activo', 'Lleno'].includes(viaje.estado)) {
+      throw new Error('Solo se pueden completar viajes activos o llenos');
+    }
+
     return await ViajeRepository.completarViaje(id);
   },
 
   async verificarViajeActivo(id_conductor) {
+    // Verificar y actualizar viajes vencidos antes de verificar
+    await ViajeRepository.verificarYActualizarViajesVencidos();
     return await ViajeRepository.buscarViajeActivoPorConductor(id_conductor);
+  },
+
+  async actualizarViajesVencidos() {
+    return await ViajeRepository.verificarYActualizarViajesVencidos();
   }
 };

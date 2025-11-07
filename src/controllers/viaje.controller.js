@@ -95,15 +95,21 @@ export const ViajeController = {
   async cancelarViaje(req, res) {
     try {
       const { id } = req.params;
-      const eliminado = await ViajeService.cancelarViaje(id);
-      if (!eliminado) {
-        return res.status(404).json({ error: 'Viaje no encontrado' });
+      const id_conductor = req.user?.id_usuario;
+      
+      if (!id_conductor) {
+        return res.status(401).json({ error: 'No autorizado: token inválido' });
       }
 
-      return res.json({ message: 'Viaje cancelado con éxito' });
+      const viajeCancelado = await ViajeService.cancelarViaje(parseInt(id), id_conductor);
+      
+      return res.json({ 
+        message: 'Viaje cancelado con éxito',
+        viaje: viajeCancelado
+      });
     } catch (err) {
       console.error('Error en cancelarViaje:', err);
-      return res.status(500).json({ error: 'Error interno del servidor' });
+      return res.status(400).json({ error: err.message });
     }
   },
 
@@ -129,15 +135,35 @@ export const ViajeController = {
   async completarViaje(req, res) {
     try {
       const { id } = req.params;
-      const completado = await ViajeService.completarViaje(id);
-      if (!completado) {
-        return res.status(404).json({ error: 'Viaje no encontrado' });
+      const id_conductor = req.user?.id_usuario;
+      
+      if (!id_conductor) {
+        return res.status(401).json({ error: 'No autorizado: token inválido' });
       }
 
-      return res.json({ message: 'Viaje completado con éxito' });
+      const viajeCompletado = await ViajeService.completarViaje(parseInt(id), id_conductor);
+      
+      return res.json({ 
+        message: 'Viaje completado con éxito',
+        viaje: viajeCompletado
+      });
     } catch (err) {
       console.error('Error en completarViaje:', err);
-      return res.status(500).json({ error: 'Error interno del servidor' });
+      return res.status(400).json({ error: err.message });
+    }
+  },
+
+  async actualizarViajesVencidos(req, res) {
+    try {
+      const viajesActualizados = await ViajeService.actualizarViajesVencidos();
+      
+      return res.json({ 
+        message: `${viajesActualizados.length} viajes actualizados`,
+        viajes: viajesActualizados
+      });
+    } catch (err) {
+      console.error('Error en actualizarViajesVencidos:', err);
+      return res.status(500).json({ error: err.message });
     }
   }
 };

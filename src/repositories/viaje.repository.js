@@ -19,6 +19,7 @@ export const ViajeRepository = {
       JOIN Usuarios u ON v.id_conductor = u.id_usuario
       JOIN Vehiculos ve ON v.id_vehiculo = ve.id_vehiculo
       WHERE v.estado = 'Activo' AND v.cupos_disponibles > 0
+      AND DATE(v.fecha_salida) = CURRENT_DATE
     `;
     const values = [];
     let paramCount = 1;
@@ -60,6 +61,7 @@ export const ViajeRepository = {
       FROM Viajes v
       JOIN Vehiculos ve ON v.id_vehiculo = ve.id_vehiculo
       WHERE v.id_conductor = $1
+      AND DATE(v.fecha_salida) = CURRENT_DATE
       ORDER BY v.fecha_salida DESC
     `;
     const result = await pool.query(query, [id_conductor]);
@@ -95,18 +97,41 @@ export const ViajeRepository = {
     const query = `
       UPDATE Viajes 
       SET estado = 'Cancelado'
-      WHERE id_viaje = $1 AND estado = 'Activo'
+      WHERE id_viaje = $1 AND estado IN ('Activo', 'Lleno')
       RETURNING *;
     `;
     const result = await pool.query(query, [id]);
     return result.rows[0];
   },
 
+  async puedeModificarViaje(id_viaje) {
+    const query = `
+      SELECT *, 
+        EXTRACT(EPOCH FROM (fecha_salida - NOW())) / 3600 as horas_restantes
+      FROM Viajes 
+      WHERE id_viaje = $1
+    `;
+    const result = await pool.query(query, [id_viaje]);
+    const viaje = result.rows[0];
+    
+    if (!viaje) return { puede: false, razon: 'Viaje no encontrado' };
+    
+    if (!['Activo', 'Lleno'].includes(viaje.estado)) {
+      return { puede: false, razon: 'El viaje no está disponible para modificaciones' };
+    }
+    
+    if (viaje.horas_restantes <= 1) {
+      return { puede: false, razon: 'Solo se puede cancelar el viaje si faltan más de 1 hora para la salida' };
+    }
+    
+    return { puede: true, viaje };
+  },
+
   async completarViaje(id) {
     const query = `
       UPDATE Viajes 
       SET estado = 'Completado'
-      WHERE id_viaje = $1 AND estado = 'Activo'
+      WHERE id_viaje = $1 AND estado IN ('Activo', 'Lleno')
       RETURNING *;
     `;
     const result = await pool.query(query, [id]);
@@ -144,5 +169,31 @@ export const ViajeRepository = {
     `;
     const result = await pool.query(query, [id_viaje]);
     return result.rows[0];
+  },
+
+  async actualizarViajesVencidos() {
+    const query = `
+      UPDATE Viajes 
+      SET estado = 'Expirado'
+      WHERE estado IN ('Activo', 'Lleno') 
+      AND fecha_salida < NOW()
+      RETURNING id_viaje, origen, destino, fecha_salida, estado;
+    `;
+    const result = await pool.query(query);
+    return result.rows;
+  },
+
+  async verificarYActualizarViajesVencidos() {
+    // Primero actualizamos los viajes vencidos
+    const viajesActualizados = await this.actualizarViajesVencidos();
+    
+    if (viajesActualizados.length > 0) {
+      console.log(`✅ ${viajesActualizados.length} viajes marcados como expirados automáticamente`);
+      viajesActualizados.forEach(viaje => {
+        console.log(`   - Viaje ${viaje.id_viaje}: ${viaje.origen} → ${viaje.destino} (${viaje.fecha_salida})`);
+      });
+    }
+    
+    return viajesActualizados;
   }
 };

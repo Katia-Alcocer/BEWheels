@@ -167,5 +167,56 @@ export const ReservaService = {
 
   async listarSolicitudesConductor(id_conductor) {
     return await ReservaRepository.listarSolicitudesConductor(id_conductor);
+  },
+
+  async eliminarReserva(id_reserva, id_pasajero) {
+    const reserva = await ReservaRepository.obtenerReserva(id_reserva);
+    if (!reserva) {
+      throw new Error('La reserva no existe');
+    }
+
+    // Verificar que sea el pasajero de la reserva
+    if (reserva.id_pasajero !== id_pasajero) {
+      throw new Error('No tienes autorización para eliminar esta reserva');
+    }
+
+    // Solo se puede eliminar si está pendiente o aceptada
+    if (!['Pendiente', 'Aceptada'].includes(reserva.estado)) {
+      throw new Error('No puedes eliminar esta reserva en su estado actual');
+    }
+
+    // Verificar el tiempo restante (más de 1 hora)
+    const validacionTiempo = await ReservaRepository.verificarTiempoReserva(id_reserva);
+    if (!validacionTiempo.puede) {
+      throw new Error(validacionTiempo.razon);
+    }
+
+    // Eliminar la reserva
+    const reservaEliminada = await ReservaRepository.eliminarReserva(id_reserva);
+    if (!reservaEliminada) {
+      throw new Error('No se pudo eliminar la reserva');
+    }
+
+    // Si estaba aceptada, liberar los cupos
+    if (reserva.estado === 'Aceptada') {
+      const viaje = await ViajeRepository.obtenerViaje(reserva.id_viaje);
+      const nuevosCuposDisponibles = viaje.cupos_disponibles + reserva.cupos_reservados;
+      await ViajeRepository.actualizarCuposDisponibles(reserva.id_viaje, nuevosCuposDisponibles);
+
+      // Si el viaje estaba lleno, reactivarlo
+      if (viaje.estado === 'Lleno') {
+        await ViajeRepository.actualizarViaje(reserva.id_viaje, { estado: 'Activo' });
+      }
+    }
+
+    // Notificar al conductor siempre (ya sea pendiente o aceptada)
+    const viaje = await ViajeRepository.obtenerViaje(reserva.id_viaje);
+    await NotificacionService.enviarNotificacion({
+      id_usuario: viaje.id_conductor,
+      titulo: 'Reserva eliminada',
+      mensaje: `Un pasajero ha eliminado su reserva de ${reserva.cupos_reservados} cupo(s) en tu viaje de ${viaje.origen} a ${viaje.destino}`
+    });
+
+    return reservaEliminada;
   }
 };

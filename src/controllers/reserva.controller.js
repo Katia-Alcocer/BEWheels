@@ -145,5 +145,26 @@ export const ReservaController = {
       console.error('❌ Error al listar solicitudes del conductor:', err);
       return res.status(500).json({ error: err.message });
     }
+  },
+
+  async eliminarReserva(req, res) {
+    try {
+      const id_pasajero = req.user?.id_usuario;
+      if (!id_pasajero) {
+        return res.status(401).json({ error: 'No autorizado: token inválido' });
+      }
+
+      const { id_reserva } = req.params;
+
+      const reservaEliminada = await ReservaService.eliminarReserva(parseInt(id_reserva), id_pasajero);
+
+      return res.json({
+        message: 'Reserva eliminada con éxito',
+        reserva: reservaEliminada
+      });
+    } catch (err) {
+      console.error('❌ Error al eliminar reserva:', err);
+      return res.status(400).json({ error: err.message });
+    }
   }
 };

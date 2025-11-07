@@ -26,14 +26,16 @@ export const ReservaRepository = {
 
   async listarReservasPorPasajero(id_pasajero) {
     const query = `
-      SELECT r.*, v.origen, v.destino, v.fecha_salida, v.estado as estado_viaje,
+      SELECT r.*, v.origen, v.destino, v.fecha_salida, v.estado as estado_viaje, v.tarifa,
              u.nombre as nombre_conductor, u.telefono as telefono_conductor,
              ve.marca, ve.modelo, ve.placa
       FROM Reservas r
       JOIN Viajes v ON r.id_viaje = v.id_viaje
       JOIN Usuarios u ON v.id_conductor = u.id_usuario
       JOIN Vehiculos ve ON v.id_vehiculo = ve.id_vehiculo
-      WHERE r.id_pasajero = $1
+      WHERE r.id_pasajero = $1 
+      AND r.estado IN ('Pendiente', 'Aceptada')
+      AND DATE(v.fecha_salida) = CURRENT_DATE
       ORDER BY v.fecha_salida DESC
     `;
     const result = await pool.query(query, [id_pasajero]);
@@ -73,6 +75,36 @@ export const ReservaRepository = {
     `;
     const result = await pool.query(query, [id_reserva]);
     return result.rows[0];
+  },
+
+  async eliminarReserva(id_reserva) {
+    const query = `
+      DELETE FROM Reservas 
+      WHERE id_reserva = $1 AND estado IN ('Pendiente', 'Aceptada')
+      RETURNING *;
+    `;
+    const result = await pool.query(query, [id_reserva]);
+    return result.rows[0];
+  },
+
+  async verificarTiempoReserva(id_reserva) {
+    const query = `
+      SELECT r.*, v.fecha_salida,
+        EXTRACT(EPOCH FROM (v.fecha_salida - NOW())) / 3600 as horas_restantes
+      FROM Reservas r
+      JOIN Viajes v ON r.id_viaje = v.id_viaje
+      WHERE r.id_reserva = $1
+    `;
+    const result = await pool.query(query, [id_reserva]);
+    const reserva = result.rows[0];
+    
+    if (!reserva) return { puede: false, razon: 'Reserva no encontrada' };
+    
+    if (reserva.horas_restantes <= 1) {
+      return { puede: false, razon: 'Solo se puede eliminar la reserva si faltan más de 1 hora para la salida' };
+    }
+    
+    return { puede: true, reserva };
   },
 
   async verificarReservaExistente(id_viaje, id_pasajero) {

@@ -28,6 +28,9 @@ router.put('/:id', ViajeController.actualizarViaje);
 // PUT /api/viajes/:id/completar
 router.put('/:id/completar', ViajeController.completarViaje);
 
+// PUT /api/viajes/actualizar-vencidos
+router.put('/actualizar-vencidos', ViajeController.actualizarViajesVencidos);
+
 // DELETE /api/viajes/:id
 router.delete('/:id', ViajeController.cancelarViaje);
 

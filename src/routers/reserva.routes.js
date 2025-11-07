@@ -22,6 +22,9 @@ router.put('/:id_reserva/rechazar', authenticateToken, ReservaController.rechaza
 // Cancelar reserva (pasajero)
 router.put('/:id_reserva/cancelar', authenticateToken, ReservaController.cancelarReserva);
 
+// Eliminar reserva completamente (pasajero)
+router.delete('/:id_reserva', authenticateToken, ReservaController.eliminarReserva);
+
 // Listar reservas de un viaje específico (conductor)
 router.get('/viaje/:id_viaje', authenticateToken, ReservaController.listarReservasDelViaje);
 

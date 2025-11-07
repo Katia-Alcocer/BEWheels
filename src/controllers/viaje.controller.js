@@ -33,8 +33,9 @@ export const ViajeController = {
     try {
       const { origen, destino, fecha } = req.query;
       const filtros = { origen, destino, fecha };
+      const id_usuario_actual = req.user?.id_usuario;
       
-      const viajes = await ViajeService.listarViajesDisponibles(filtros);
+      const viajes = await ViajeService.listarViajesDisponibles(filtros, id_usuario_actual);
       return res.json(viajes);
     } catch (err) {
       console.error('Error en listarViajesDisponibles:', err);

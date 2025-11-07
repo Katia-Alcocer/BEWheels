@@ -11,8 +11,8 @@ export const ViajeService = {
     return await ViajeRepository.crearViaje(datosViaje);
   },
 
-  async listarViajesDisponibles(filtros) {
-    return await ViajeRepository.listarViajesDisponibles(filtros);
+  async listarViajesDisponibles(filtros, id_usuario_actual = null) {
+    return await ViajeRepository.listarViajesDisponibles(filtros, id_usuario_actual);
   },
 
   async listarViajesPorConductor(id_conductor) {

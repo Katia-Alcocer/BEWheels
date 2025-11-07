@@ -12,7 +12,7 @@ export const ViajeRepository = {
     return result.rows[0];
   },
 
-  async listarViajesDisponibles(filtros) {
+  async listarViajesDisponibles(filtros, id_usuario_actual = null) {
     let query = `
       SELECT v.*, u.nombre as nombre_conductor, ve.marca, ve.modelo, ve.placa
       FROM Viajes v
@@ -22,6 +22,13 @@ export const ViajeRepository = {
     `;
     const values = [];
     let paramCount = 1;
+
+    // TEMPORALMENTE COMENTADO: Excluir viajes del propio usuario
+    // if (id_usuario_actual) {
+    //   query += ` AND v.id_conductor != $${paramCount}`;
+    //   values.push(id_usuario_actual);
+    //   paramCount++;
+    // }
 
     if (filtros.origen) {
       query += ` AND v.origen ILIKE $${paramCount}`;

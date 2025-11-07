@@ -10,14 +10,14 @@ router.use(authenticateToken);
 // POST /api/viajes
 router.post('/', ViajeController.crearViaje);
 
-// GET /api/viajes/disponibles
-router.get('/disponibles', ViajeController.listarViajesDisponibles);
+// GET /api/viajes - Lista viajes disponibles (sin /disponibles)
+router.get('/', ViajeController.listarViajesDisponibles);
 
 // GET /api/viajes/mis-viajes
 router.get('/mis-viajes', ViajeController.listarMisViajes);
 
-// GET /api/viajes/viaje-activo
-router.get('/viaje-activo', ViajeController.verificarViajeActivo);
+// GET /api/viajes/verificar-activo
+router.get('/verificar-activo', ViajeController.verificarViajeActivo);
 
 // GET /api/viajes/:id
 router.get('/:id', ViajeController.obtenerViaje);

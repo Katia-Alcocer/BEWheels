@@ -27,7 +27,7 @@ export const ReservaController = {
         reserva: nuevaReserva
       });
     } catch (err) {
-      console.error('❌ Error al crear reserva:', err);
+      console.error(' Error al crear reserva:', err);
       return res.status(400).json({ error: err.message });
     }
   },
@@ -48,7 +48,7 @@ export const ReservaController = {
         reserva: reservaActualizada
       });
     } catch (err) {
-      console.error('❌ Error al aceptar reserva:', err);
+      console.error(' Error al aceptar reserva:', err);
       return res.status(400).json({ error: err.message });
     }
   },
@@ -69,7 +69,7 @@ export const ReservaController = {
         reserva: reservaActualizada
       });
     } catch (err) {
-      console.error('❌ Error al rechazar reserva:', err);
+      console.error(' Error al rechazar reserva:', err);
       return res.status(400).json({ error: err.message });
     }
   },
@@ -90,7 +90,7 @@ export const ReservaController = {
         reserva: reservaActualizada
       });
     } catch (err) {
-      console.error('❌ Error al cancelar reserva:', err);
+      console.error(' Error al cancelar reserva:', err);
       return res.status(400).json({ error: err.message });
     }
   },
@@ -106,7 +106,7 @@ export const ReservaController = {
 
       return res.json(reservas);
     } catch (err) {
-      console.error('❌ Error al listar reservas:', err);
+      console.error(' Error al listar reservas:', err);
       return res.status(500).json({ error: err.message });
     }
   },
@@ -126,7 +126,7 @@ export const ReservaController = {
 
       return res.json(reservas);
     } catch (err) {
-      console.error('❌ Error al listar reservas del viaje:', err);
+      console.error(' Error al listar reservas del viaje:', err);
       return res.status(500).json({ error: err.message });
     }
   },
@@ -142,7 +142,7 @@ export const ReservaController = {
 
       return res.json(solicitudes);
     } catch (err) {
-      console.error('❌ Error al listar solicitudes del conductor:', err);
+      console.error(' Error al listar solicitudes del conductor:', err);
       return res.status(500).json({ error: err.message });
     }
   },
@@ -163,7 +163,7 @@ export const ReservaController = {
         reserva: reservaEliminada
       });
     } catch (err) {
-      console.error('❌ Error al eliminar reserva:', err);
+      console.error(' Error al eliminar reserva:', err);
       return res.status(400).json({ error: err.message });
     }
   }

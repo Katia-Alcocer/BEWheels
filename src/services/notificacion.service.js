@@ -6,7 +6,7 @@ export const NotificacionService = {
       return await NotificacionRepository.crearNotificacion(datosNotificacion);
     } catch (error) {
       console.error('Error enviando notificación:', error);
-      // No fallar el proceso principal si falla la notificación
+      
       return null;
     }
   },

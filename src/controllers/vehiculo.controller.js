@@ -11,13 +11,13 @@ export const VehiculoController = {
         });
       }
 
-      // Agregar el ID del usuario autenticado
+     
       const datosVehiculo = {
         ...value,
         id_usuario: req.user.id_usuario
       };
 
-      // Si hay archivo de foto, agregar la ruta
+  
       if (req.file) {
         datosVehiculo.foto = `/uploads/${req.file.filename}`;
       }
@@ -68,7 +68,7 @@ export const VehiculoController = {
         });
       }
 
-      // Si hay archivo de foto, agregar la ruta
+      
       if (req.file) {
         value.foto = `/uploads/${req.file.filename}`;
       }

@@ -19,7 +19,7 @@ export const ViajeRepository = {
       JOIN Usuarios u ON v.id_conductor = u.id_usuario
       JOIN Vehiculos ve ON v.id_vehiculo = ve.id_vehiculo
       WHERE v.estado = 'Activo' AND v.cupos_disponibles > 0
-      AND DATE(v.fecha_salida) = CURRENT_DATE
+      AND DATE(v.fecha_salida) >= CURRENT_DATE
     `;
     const values = [];
     let paramCount = 1;
@@ -61,7 +61,7 @@ export const ViajeRepository = {
       FROM Viajes v
       JOIN Vehiculos ve ON v.id_vehiculo = ve.id_vehiculo
       WHERE v.id_conductor = $1
-      AND DATE(v.fecha_salida) = CURRENT_DATE
+      AND DATE(v.fecha_salida) >= CURRENT_DATE
       ORDER BY v.fecha_salida DESC
     `;
     const result = await pool.query(query, [id_conductor]);
@@ -184,11 +184,11 @@ export const ViajeRepository = {
   },
 
   async verificarYActualizarViajesVencidos() {
-    // Primero actualizamos los viajes vencidos
+   
     const viajesActualizados = await this.actualizarViajesVencidos();
     
     if (viajesActualizados.length > 0) {
-      console.log(`✅ ${viajesActualizados.length} viajes marcados como expirados automáticamente`);
+      console.log(` ${viajesActualizados.length} viajes marcados como expirados automáticamente`);
       viajesActualizados.forEach(viaje => {
         console.log(`   - Viaje ${viaje.id_viaje}: ${viaje.origen} → ${viaje.destino} (${viaje.fecha_salida})`);
       });

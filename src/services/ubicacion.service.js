@@ -6,13 +6,13 @@ export const UbicacionService = {
   },
 
   async crearUbicacion(nombre) {
-    // Verificar si ya existe
+    
     const existente = await UbicacionRepository.buscarPorNombre(nombre);
     if (existente) {
       throw new Error('La ubicación ya existe');
     }
 
-    // Validar nombre
+  
     if (!nombre || nombre.trim().length < 3) {
       throw new Error('El nombre de la ubicación debe tener al menos 3 caracteres');
     }
@@ -25,13 +25,13 @@ export const UbicacionService = {
   },
 
   async buscarOCrearUbicacion(nombre) {
-    // Buscar si existe
+ 
     const existente = await UbicacionRepository.buscarPorNombre(nombre);
     if (existente) {
       return existente;
     }
 
-    // Si no existe, crearla
+   
     return await this.crearUbicacion(nombre);
   }
 };

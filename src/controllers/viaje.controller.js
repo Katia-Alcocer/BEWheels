@@ -11,7 +11,6 @@ export const ViajeController = {
         });
       }
 
-      // Agregar el ID del usuario autenticado
       const datosViaje = {
         ...value,
         id_conductor: req.user.id_usuario

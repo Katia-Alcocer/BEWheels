@@ -6,7 +6,7 @@ export const UbicacionController = {
       const ubicaciones = await UbicacionService.listarUbicaciones();
       return res.json(ubicaciones);
     } catch (err) {
-      console.error('❌ Error al listar ubicaciones:', err);
+      console.error(' Error al listar ubicaciones:', err);
       return res.status(500).json({ error: err.message });
     }
   },
@@ -25,7 +25,7 @@ export const UbicacionController = {
         ubicacion: nuevaUbicacion
       });
     } catch (err) {
-      console.error('❌ Error al crear ubicación:', err);
+      console.error(' Error al crear ubicación:', err);
       const statusCode = err.message.includes('ya existe') ? 409 : 400;
       return res.status(statusCode).json({ error: err.message });
     }
@@ -45,7 +45,7 @@ export const UbicacionController = {
         ubicacion: ubicacion
       });
     } catch (err) {
-      console.error('❌ Error al buscar/crear ubicación:', err);
+      console.error(' Error al buscar/crear ubicación:', err);
       return res.status(400).json({ error: err.message });
     }
   }

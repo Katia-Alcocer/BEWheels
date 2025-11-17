@@ -4,19 +4,19 @@ import { authenticateToken } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-// Listar notificaciones del usuario
+
 router.get('/', authenticateToken, NotificacionController.listarNotificaciones);
 
-// Listar notificaciones no leídas
+
 router.get('/no-leidas', authenticateToken, NotificacionController.listarNotificacionesNoLeidas);
 
-// Contar notificaciones no leídas
+
 router.get('/no-leidas/count', authenticateToken, NotificacionController.contarNoLeidas);
 
-// Marcar notificación específica como leída
+
 router.put('/:id_notificacion/leida', authenticateToken, NotificacionController.marcarComoLeida);
 
-// Marcar todas las notificaciones como leídas
+
 router.put('/todas/leidas', authenticateToken, NotificacionController.marcarTodasComoLeidas);
 
 export default router;

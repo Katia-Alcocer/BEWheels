@@ -8,14 +8,14 @@ export const UsuarioController = {
   return res.status(400).json({ error: 'No se recibieron datos del usuario.' });
 }
 
-console.log('🟢 Body recibido:', req.body);
-console.log('🟣 Archivo recibido:', req.file);
+console.log(' Body recibido:', req.body);
+console.log(' Archivo recibido:', req.file);
 
     console.log('---- DEBUG MULTER ----');
   console.log('Headers:', req.headers['content-type']);
   console.log('Body keys:', req.body ? Object.keys(req.body) : 'req.body es undefined');
   console.log('File:', req.file);
-  // luego sigue con el try { ... }
+  
     try {
       console.log('--- REGISTRO USUARIO ---');
       console.log('req.body inicial:', req.body);
@@ -29,7 +29,7 @@ console.log('🟣 Archivo recibido:', req.file);
         Object.keys(req.body).length === 0 &&
         req.headers['content-type']?.includes('multipart/form-data')
       ) {
-        console.warn('⚠️ req.body llegó vacío. Posiblemente no se subió imagen.');
+        console.warn(' req.body llegó vacío. Posiblemente no se subió imagen.');
        
         req.body = {
           nombre: req.body?.nombre || req.body.get?.('nombre'),
@@ -73,7 +73,7 @@ console.log('🟣 Archivo recibido:', req.file);
         usuario: nuevoUsuario
       });
     } catch (err) {
-      console.error('❌ Error en registrarUsuario:', err);
+      console.error(' Error en registrarUsuario:', err);
 
      
       let msg = err.message;
@@ -95,7 +95,7 @@ console.log('🟣 Archivo recibido:', req.file);
       const usuarios = await UsuarioService.listarUsuarios();
       return res.json(usuarios);
     } catch (err) {
-      console.error('❌ Error al listar usuarios:', err);
+      console.error(' Error al listar usuarios:', err);
       return res.status(500).json({ error: err.message });
     }
   },
@@ -122,7 +122,7 @@ console.log('🟣 Archivo recibido:', req.file);
       };
       return res.json(perfil);
     } catch (err) {
-      console.error('❌ Error en obtenerMiPerfil:', err);
+      console.error(' Error en obtenerMiPerfil:', err);
       return res.status(500).json({ error: 'Error interno del servidor' });
     }
   },
@@ -134,10 +134,10 @@ console.log('🟣 Archivo recibido:', req.file);
         return res.status(401).json({ error: 'No autorizado: token inválido' });
       }
 
-      // DEBUG: Ver qué llega del frontend
-      console.log('🔍 req.body completo:', req.body);
-      console.log('🔍 Claves en req.body:', Object.keys(req.body || {}));
-      console.log('🔍 Archivo recibido:', req.file);
+   
+      console.log(' req.body completo:', req.body);
+      console.log(' Claves en req.body:', Object.keys(req.body || {}));
+      console.log(' Archivo recibido:', req.file);
 
       // Construir payload permitido (ignorar correo si viene)
       const input = {
@@ -147,15 +147,15 @@ console.log('🟣 Archivo recibido:', req.file);
         contrasena: req.body?.contrasena, // Incluir contraseña
       };
 
-      // Si se cargó foto, agregar ruta
+      
       if (req.file) {
         input.foto_perfil = `/uploads/${req.file.filename}`;
       }
 
-      // Validar y filtrar campos permitidos automáticamente
+     
       const { error, value } = usuarioUpdateSchema.validate(input, { 
         abortEarly: true,
-        stripUnknown: true // Esto elimina campos no definidos en el esquema
+        stripUnknown: true 
       });
       if (error) {
         return res.status(400).json({ error: error.details[0].message });
@@ -169,7 +169,7 @@ console.log('🟣 Archivo recibido:', req.file);
 
       return res.json({ success: true, usuario: usuarioActualizado });
     } catch (err) {
-      console.error('❌ Error en actualizarMiPerfil:', err);
+      console.error(' Error en actualizarMiPerfil:', err);
       const msg = err.message?.includes('ya está registrado')
         ? err.message
         : (err.message || 'Error al actualizar el perfil');

@@ -12,7 +12,7 @@ export const NotificacionController = {
 
       return res.json(notificaciones);
     } catch (err) {
-      console.error('❌ Error al listar notificaciones:', err);
+      console.error(' Error al listar notificaciones:', err);
       return res.status(500).json({ error: err.message });
     }
   },
@@ -28,7 +28,7 @@ export const NotificacionController = {
 
       return res.json(notificaciones);
     } catch (err) {
-      console.error('❌ Error al listar notificaciones no leídas:', err);
+      console.error(' Error al listar notificaciones no leídas:', err);
       return res.status(500).json({ error: err.message });
     }
   },
@@ -53,7 +53,7 @@ export const NotificacionController = {
         notificacion
       });
     } catch (err) {
-      console.error('❌ Error al marcar notificación como leída:', err);
+      console.error(' Error al marcar notificación como leída:', err);
       return res.status(500).json({ error: err.message });
     }
   },
@@ -72,7 +72,7 @@ export const NotificacionController = {
         resultado
       });
     } catch (err) {
-      console.error('❌ Error al marcar todas las notificaciones como leídas:', err);
+      console.error(' Error al marcar todas las notificaciones como leídas:', err);
       return res.status(500).json({ error: err.message });
     }
   },
@@ -88,7 +88,7 @@ export const NotificacionController = {
 
       return res.json({ total_no_leidas: count });
     } catch (err) {
-      console.error('❌ Error al contar notificaciones no leídas:', err);
+      console.error(' Error al contar notificaciones no leídas:', err);
       return res.status(500).json({ error: err.message });
     }
   }

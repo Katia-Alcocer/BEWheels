@@ -35,7 +35,7 @@ export const ReservaRepository = {
       JOIN Vehiculos ve ON v.id_vehiculo = ve.id_vehiculo
       WHERE r.id_pasajero = $1 
       AND r.estado IN ('Pendiente', 'Aceptada')
-      AND DATE(v.fecha_salida) = CURRENT_DATE
+      AND DATE(v.fecha_salida) >= CURRENT_DATE
       ORDER BY v.fecha_salida DESC
     `;
     const result = await pool.query(query, [id_pasajero]);

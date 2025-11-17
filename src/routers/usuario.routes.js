@@ -14,7 +14,6 @@ router.post(
 
 router.get('/', UsuarioController.listarUsuarios);
 
-// Perfil del usuario autenticado
 router.get('/mi-perfil', authenticateToken, UsuarioController.obtenerMiPerfil);
 router.put(
   '/mi-perfil',

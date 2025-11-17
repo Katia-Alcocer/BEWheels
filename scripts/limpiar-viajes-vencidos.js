@@ -5,7 +5,7 @@ import { pool } from '../src/config/db.config.js';
  */
 async function limpiarViajesVencidos() {
   try {
-    console.log('🧹 Iniciando limpieza de viajes vencidos...');
+    console.log(' Iniciando limpieza de viajes vencidos...');
     
     const query = `
       UPDATE Viajes 
@@ -19,9 +19,9 @@ async function limpiarViajesVencidos() {
     const viajesActualizados = result.rows;
     
     if (viajesActualizados.length === 0) {
-      console.log('✅ No hay viajes vencidos para actualizar');
+      console.log(' No hay viajes vencidos para actualizar');
     } else {
-      console.log(`✅ ${viajesActualizados.length} viajes marcados como expirados:`);
+      console.log(` ${viajesActualizados.length} viajes marcados como expirados:`);
       viajesActualizados.forEach(viaje => {
         console.log(`   - Viaje ${viaje.id_viaje}: ${viaje.origen} → ${viaje.destino}`);
         console.log(`     Fecha de salida: ${viaje.fecha_salida}`);
@@ -33,7 +33,7 @@ async function limpiarViajesVencidos() {
     await pool.end();
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error al limpiar viajes vencidos:', error);
+    console.error(' Error al limpiar viajes vencidos:', error);
     await pool.end();
     process.exit(1);
   }

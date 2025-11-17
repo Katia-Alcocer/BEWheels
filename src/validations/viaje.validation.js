@@ -21,6 +21,17 @@ export const viajeSchema = Joi.object({
     }),
   fecha_salida: Joi.date()
     .greater('now')
+    .custom((value, helpers) => {
+      const ahora = new Date();
+      const fechaViaje = new Date(value);
+      const horasMinimas = 2;
+      const diferenciaHoras = (fechaViaje - ahora) / (1000 * 60 * 60);
+      
+      if (diferenciaHoras < horasMinimas) {
+        return helpers.message(`La fecha de salida debe ser al menos ${horasMinimas} horas en el futuro`);
+      }
+      return value;
+    })
     .required()
     .messages({
       'date.base': 'La fecha de salida debe ser una fecha válida.',

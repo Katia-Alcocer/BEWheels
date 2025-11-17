@@ -28,5 +28,16 @@ export const RolRepository = {
     `;
     const { rows } = await pool.query(query, [id_usuario, id_rol]);
     return rows[0];
+  },
+
+  async desactivarRolUsuario(id_usuario, id_rol) {
+    const query = `
+      UPDATE Usuarios_Roles 
+      SET rol_activo = false
+      WHERE id_usuario = $1 AND id_rol = $2
+      RETURNING *;
+    `;
+    const { rows } = await pool.query(query, [id_usuario, id_rol]);
+    return rows[0];
   }
 };

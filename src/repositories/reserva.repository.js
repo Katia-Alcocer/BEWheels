@@ -4,7 +4,7 @@ export const ReservaRepository = {
   async crearReserva({ id_viaje, id_pasajero, cupos_reservados, punto_recogida, punto_destino }) {
     const query = `
       INSERT INTO Reservas (id_viaje, id_pasajero, cupos_reservados, punto_recogida, punto_destino, estado)
-      VALUES ($1, $2, $3, $4, $5, 'Pendiente')
+      VALUES ($1, $2, $3, $4, $5, 'Aceptada')
       RETURNING id_reserva, id_viaje, id_pasajero, cupos_reservados, punto_recogida, punto_destino, estado, fecha_reserva;
     `;
     const values = [id_viaje, id_pasajero, cupos_reservados, punto_recogida, punto_destino];
@@ -34,8 +34,8 @@ export const ReservaRepository = {
       JOIN Usuarios u ON v.id_conductor = u.id_usuario
       JOIN Vehiculos ve ON v.id_vehiculo = ve.id_vehiculo
       WHERE r.id_pasajero = $1 
-      AND r.estado IN ('Pendiente', 'Aceptada')
-      AND DATE(v.fecha_salida) >= CURRENT_DATE
+      AND r.estado IN ('Aceptada')
+      AND v.fecha_salida >= NOW()
       ORDER BY v.fecha_salida DESC
     `;
     const result = await pool.query(query, [id_pasajero]);
@@ -70,7 +70,7 @@ export const ReservaRepository = {
     const query = `
       UPDATE Reservas 
       SET estado = 'Cancelada'
-      WHERE id_reserva = $1 AND estado IN ('Pendiente', 'Aceptada')
+      WHERE id_reserva = $1 AND estado = 'Aceptada'
       RETURNING *;
     `;
     const result = await pool.query(query, [id_reserva]);
@@ -80,7 +80,7 @@ export const ReservaRepository = {
   async eliminarReserva(id_reserva) {
     const query = `
       DELETE FROM Reservas 
-      WHERE id_reserva = $1 AND estado IN ('Pendiente', 'Aceptada')
+      WHERE id_reserva = $1 AND estado = 'Aceptada'
       RETURNING *;
     `;
     const result = await pool.query(query, [id_reserva]);
@@ -100,8 +100,8 @@ export const ReservaRepository = {
     
     if (!reserva) return { puede: false, razon: 'Reserva no encontrada' };
     
-    if (reserva.horas_restantes <= 1) {
-      return { puede: false, razon: 'Solo se puede eliminar la reserva si faltan más de 1 hora para la salida' };
+    if (reserva.horas_restantes <= 2) {
+      return { puede: false, razon: 'Solo se puede eliminar la reserva si faltan más de 2 horas para la salida' };
     }
     
     return { puede: true, reserva };
@@ -110,7 +110,7 @@ export const ReservaRepository = {
   async verificarReservaExistente(id_viaje, id_pasajero) {
     const query = `
       SELECT * FROM Reservas 
-      WHERE id_viaje = $1 AND id_pasajero = $2 AND estado IN ('Pendiente', 'Aceptada')
+      WHERE id_viaje = $1 AND id_pasajero = $2 AND estado = 'Aceptada'
       LIMIT 1
     `;
     const result = await pool.query(query, [id_viaje, id_pasajero]);

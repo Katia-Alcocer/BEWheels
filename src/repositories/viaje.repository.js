@@ -19,7 +19,7 @@ export const ViajeRepository = {
       JOIN Usuarios u ON v.id_conductor = u.id_usuario
       JOIN Vehiculos ve ON v.id_vehiculo = ve.id_vehiculo
       WHERE v.estado = 'Activo' AND v.cupos_disponibles > 0
-      AND DATE(v.fecha_salida) >= CURRENT_DATE
+      AND v.fecha_salida >= NOW()
     `;
     const values = [];
     let paramCount = 1;
@@ -61,7 +61,7 @@ export const ViajeRepository = {
       FROM Viajes v
       JOIN Vehiculos ve ON v.id_vehiculo = ve.id_vehiculo
       WHERE v.id_conductor = $1
-      AND DATE(v.fecha_salida) >= CURRENT_DATE
+      AND v.fecha_salida >= NOW()
       ORDER BY v.fecha_salida DESC
     `;
     const result = await pool.query(query, [id_conductor]);
@@ -107,7 +107,7 @@ export const ViajeRepository = {
   async puedeModificarViaje(id_viaje) {
     const query = `
       SELECT *, 
-        EXTRACT(EPOCH FROM (fecha_salida - NOW())) / 3600 as horas_restantes
+        EXTRACT(EPOCH FROM (fecha_salida - NOW())) / 60 as minutos_restantes
       FROM Viajes 
       WHERE id_viaje = $1
     `;
@@ -120,8 +120,8 @@ export const ViajeRepository = {
       return { puede: false, razon: 'El viaje no está disponible para modificaciones' };
     }
     
-    if (viaje.horas_restantes <= 1) {
-      return { puede: false, razon: 'Solo se puede cancelar el viaje si faltan más de 1 hora para la salida' };
+    if (viaje.minutos_restantes <= 15) {
+      return { puede: false, razon: 'Solo se puede cancelar el viaje si faltan más de 15 minutos para la salida' };
     }
     
     return { puede: true, viaje };
@@ -139,9 +139,14 @@ export const ViajeRepository = {
   },
 
   async buscarViajeActivoPorConductor(id_conductor) {
+    // Primero actualizar viajes vencidos
+    await this.verificarYActualizarViajesVencidos();
+    
     const query = `
       SELECT * FROM Viajes 
-      WHERE id_conductor = $1 AND estado IN ('Activo', 'En_Progreso')
+      WHERE id_conductor = $1 
+      AND estado IN ('Activo', 'Lleno')
+      AND fecha_salida >= NOW()
       ORDER BY fecha_creacion DESC
       LIMIT 1
     `;
@@ -172,26 +177,52 @@ export const ViajeRepository = {
   },
 
   async actualizarViajesVencidos() {
-    const query = `
+    // Primero cancelar automáticamente viajes que están a menos de 15 minutos
+    const queryCancelar = `
+      UPDATE Viajes 
+      SET estado = 'Cancelado'
+      WHERE estado IN ('Activo', 'Lleno') 
+      AND fecha_salida > NOW()
+      AND EXTRACT(EPOCH FROM (fecha_salida - NOW())) / 60 <= 15
+      RETURNING id_viaje, origen, destino, fecha_salida, estado;
+    `;
+    const resultCancelar = await pool.query(queryCancelar);
+    
+    // Luego marcar como expirados los viajes que ya pasaron
+    const queryExpirados = `
       UPDATE Viajes 
       SET estado = 'Expirado'
       WHERE estado IN ('Activo', 'Lleno') 
       AND fecha_salida < NOW()
       RETURNING id_viaje, origen, destino, fecha_salida, estado;
     `;
-    const result = await pool.query(query);
-    return result.rows;
+    const resultExpirados = await pool.query(queryExpirados);
+    
+    // Combinar resultados
+    return [...resultCancelar.rows, ...resultExpirados.rows];
   },
 
   async verificarYActualizarViajesVencidos() {
-   
+    // Actualizamos los viajes vencidos y cancelamos los que están a menos de 15 minutos
     const viajesActualizados = await this.actualizarViajesVencidos();
     
     if (viajesActualizados.length > 0) {
-      console.log(` ${viajesActualizados.length} viajes marcados como expirados automáticamente`);
-      viajesActualizados.forEach(viaje => {
-        console.log(`   - Viaje ${viaje.id_viaje}: ${viaje.origen} → ${viaje.destino} (${viaje.fecha_salida})`);
-      });
+      const cancelados = viajesActualizados.filter(v => v.estado === 'Cancelado');
+      const expirados = viajesActualizados.filter(v => v.estado === 'Expirado');
+      
+      if (cancelados.length > 0) {
+        console.log(`✅ ${cancelados.length} viajes cancelados automáticamente (menos de 15 minutos)`);
+        cancelados.forEach(viaje => {
+          console.log(`   - Viaje ${viaje.id_viaje}: ${viaje.origen} → ${viaje.destino} (${viaje.fecha_salida})`);
+        });
+      }
+      
+      if (expirados.length > 0) {
+        console.log(`✅ ${expirados.length} viajes marcados como expirados automáticamente`);
+        expirados.forEach(viaje => {
+          console.log(`   - Viaje ${viaje.id_viaje}: ${viaje.origen} → ${viaje.destino} (${viaje.fecha_salida})`);
+        });
+      }
     }
     
     return viajesActualizados;

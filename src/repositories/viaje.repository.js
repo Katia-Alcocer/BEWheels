@@ -14,7 +14,7 @@ export const ViajeRepository = {
 
   async listarViajesDisponibles(filtros, id_usuario_actual = null) {
     let query = `
-      SELECT v.*, u.nombre as nombre_conductor, ve.marca, ve.modelo, ve.placa
+      SELECT v.*, u.nombre as nombre_conductor, ve.marca, ve.modelo, ve.placa, ve.foto
       FROM Viajes v
       JOIN Usuarios u ON v.id_conductor = u.id_usuario
       JOIN Vehiculos ve ON v.id_vehiculo = ve.id_vehiculo
@@ -57,7 +57,7 @@ export const ViajeRepository = {
 
   async listarViajesPorConductor(id_conductor) {
     const query = `
-      SELECT v.*, ve.marca, ve.modelo, ve.placa
+      SELECT v.*, ve.marca, ve.modelo, ve.placa, ve.foto
       FROM Viajes v
       JOIN Vehiculos ve ON v.id_vehiculo = ve.id_vehiculo
       WHERE v.id_conductor = $1
@@ -70,7 +70,7 @@ export const ViajeRepository = {
 
   async obtenerViaje(id) {
     const query = `
-      SELECT v.*, u.nombre as nombre_conductor, u.telefono, ve.marca, ve.modelo, ve.placa
+      SELECT v.*, u.nombre as nombre_conductor, u.telefono, ve.marca, ve.modelo, ve.placa, ve.foto
       FROM Viajes v
       JOIN Usuarios u ON v.id_conductor = u.id_usuario
       JOIN Vehiculos ve ON v.id_vehiculo = ve.id_vehiculo
